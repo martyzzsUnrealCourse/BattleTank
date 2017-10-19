@@ -1,6 +1,10 @@
 // Made by Martins Fridenbergs as part of Udemy course.
 
 #include "TankAIController.h"
+#include "Tank.h"
+
+#include "Runtime/Engine/Classes/GameFramework/Actor.h"
+#include "Runtime/Engine/Classes/Engine/World.h"
 
 void ATankAIController::BeginPlay()
 {
