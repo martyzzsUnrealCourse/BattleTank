@@ -2,6 +2,7 @@
 
 #include "TankAimingComponent.h"
 #include "TankBarrel.h"
+#include "TankTurret.h"
 
 #include "Runtime/Engine/Classes/Engine/World.h"
 #include "Runtime/Engine/Classes/GameFramework/Actor.h"
@@ -13,10 +14,9 @@ UTankAimingComponent::UTankAimingComponent()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
+	PrimaryComponentTick.bCanEverTick = false;
 }
+
 // Called when the game starts
 void UTankAimingComponent::BeginPlay()
 {
@@ -32,12 +32,16 @@ void UTankAimingComponent::MoveBarrelTowards(FVector AimDirrection)
 	auto AimAsRotator = AimDirrection.Rotation();
 	auto DeltaRotator = AimAsRotator - BarrelRotator;
 
-	Barrel->Elevate(5);//TODO Get rid of magic number
+	Barrel->Elevate(DeltaRotator.Pitch);
 }
-// Called every frame
-void UTankAimingComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+
+void UTankAimingComponent::RotateTurret(FVector AimDirrection)
 {
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	auto TurretRotator = Turret->GetForwardVector().Rotation();
+	auto AimAsRotator = AimDirrection.Rotation();
+	auto DeltaRotator = AimAsRotator - TurretRotator;
+
+	Turret->RotateTurret(DeltaRotator.Yaw);
 }
 
 void UTankAimingComponent::AimAt(FVector HitLocation, float LaunchSpeed)
@@ -62,14 +66,15 @@ void UTankAimingComponent::AimAt(FVector HitLocation, float LaunchSpeed)
 	{
 		auto AimDirrection = OutLaunchVelocity.GetSafeNormal();
 		MoveBarrelTowards(AimDirrection);
+		RotateTurret(AimDirrection);
 
-		auto Time = GetWorld()->GetTimeSeconds();
-		UE_LOG(LogTemp, Warning, TEXT("%f Have aim solution"), Time);
+		//auto Time = GetWorld()->GetTimeSeconds();
+		//UE_LOG(LogTemp, Warning, TEXT("%f Have aim solution"), Time);
 	}
 	else 
 	{
-		auto Time = GetWorld()->GetTimeSeconds();
-		UE_LOG(LogTemp, Warning, TEXT("%f Don't have aim solution"), Time);
+		//auto Time = GetWorld()->GetTimeSeconds();
+		//UE_LOG(LogTemp, Warning, TEXT("%f Don't have aim solution"), Time);
 	}
 	
 	
@@ -78,5 +83,10 @@ void UTankAimingComponent::AimAt(FVector HitLocation, float LaunchSpeed)
 void UTankAimingComponent::SetBarrelReference(UTankBarrel * BarrelToSet)
 {
 	Barrel = BarrelToSet;
+}
+
+void UTankAimingComponent::SetTurretReference(UTankTurret * TurretToSet)
+{
+	Turret = TurretToSet;
 }
 

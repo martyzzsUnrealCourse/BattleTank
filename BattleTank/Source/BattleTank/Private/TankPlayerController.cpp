@@ -15,10 +15,6 @@ void ATankPlayerController::BeginPlay()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("No Player Controlled Tank Found!"));
 	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Player Controlled Tank: %s"), *(ControlledTank->GetName()));
-	}
 }
 
 void ATankPlayerController::Tick( float DeltaTime )
