@@ -9,6 +9,7 @@
 class UTankBarrel;
 class UTankTurret;
 class UTankAimingComponent;
+class UTankMovementComponent;
 class AProjectile;
 
 UCLASS()
@@ -41,12 +42,17 @@ protected:
 	UTankAimingComponent* TankAimingComponent = nullptr;
 
 private:
-	UPROPERTY(EditAnywhere, Category = Firing)
-	float LaunchSpeed = 100000; //1000 m/s
-
-	UPROPERTY(EditAnywhere, Category = Setup)
+	UPROPERTY(EditDefaultsOnly, Category = Setup)
 	TSubclassOf<AProjectile> ProjectileBlueprint;
 
+	UPROPERTY(EditDefaultsOnly, Category = Firing)
+	float LaunchSpeed = 100000; //1000 m/s
+
+	UPROPERTY(EditDefaultsOnly, Category = Firing)
+	float ReloadTime = 3; //In seconds
+
 	UTankBarrel* Barrel = nullptr;
+
+	double LastFireTime = 0;
 	
 };
