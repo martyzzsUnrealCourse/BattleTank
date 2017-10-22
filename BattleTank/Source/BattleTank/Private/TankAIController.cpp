@@ -17,7 +17,7 @@ void ATankAIController::Tick(float DeltaTime)
 
 	auto PlayerTank = Cast<ATank>(GetWorld()->GetFirstPlayerController()->GetPawn());
 
-	if (PlayerTank) 
+	if (ensureMsgf(PlayerTank, TEXT("No player tank!"))) 
 	{
 		auto ControlledTank = Cast<ATank>(GetPawn());
 
