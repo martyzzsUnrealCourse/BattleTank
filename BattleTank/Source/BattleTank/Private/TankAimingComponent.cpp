@@ -3,6 +3,7 @@
 #include "TankAimingComponent.h"
 #include "TankBarrel.h"
 #include "TankTurret.h"
+#include "Projectile.h"
 
 #include "Runtime/Engine/Classes/Engine/World.h"
 #include "Runtime/Engine/Classes/GameFramework/Actor.h"
@@ -35,8 +36,6 @@ void UTankAimingComponent::Initialise(UTankBarrel * BarrelToSet, UTankTurret * T
 void UTankAimingComponent::MoveBarrelTowards(FVector AimDirrection)
 {
 	if (!ensureMsgf(Barrel || Turret, TEXT("Barrel or Turret not set!"))) { return; }
-	auto Time = GetWorld()->GetTimeSeconds();
-	UE_LOG(LogTemp, Warning, TEXT("%f:Here!"), Time);
 
 	// Work-out difference between current barrel roation, and AimDirection
 	auto BarrelRotator = Barrel->GetForwardVector().Rotation();
@@ -47,7 +46,7 @@ void UTankAimingComponent::MoveBarrelTowards(FVector AimDirrection)
 	Turret->RotateTurret(DeltaRotator.Yaw);
 }
 
-void UTankAimingComponent::AimAt(FVector HitLocation, float LaunchSpeed)
+void UTankAimingComponent::AimAt(FVector HitLocation)
 {
 	if (!ensureMsgf(Barrel,TEXT("No Barrel"))) { return; }
 
@@ -71,6 +70,25 @@ void UTankAimingComponent::AimAt(FVector HitLocation, float LaunchSpeed)
 		MoveBarrelTowards(AimDirrection);
 	}
 
+}
+
+void UTankAimingComponent::Fire()
+{
+	if (!ensureMsgf(Barrel && ProjectileBlueprint, TEXT("No barrelor Projectile Blueprint set!"))) { return; }
+
+	bool isReloaded = (FPlatformTime::Seconds() - LastFireTime) > ReloadTime;
+
+	if (isReloaded)
+	{
+		auto Projectile = GetWorld()->SpawnActor<AProjectile>(
+			ProjectileBlueprint,
+			Barrel->GetSocketLocation(FName("Projectile")),
+			Barrel->GetSocketRotation(FName("Projectile"))
+			);
+
+		Projectile->LaunchProjectile(LaunchSpeed);
+		LastFireTime = FPlatformTime::Seconds();
+	}
 }
 
 

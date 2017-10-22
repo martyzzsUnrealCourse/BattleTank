@@ -2,7 +2,6 @@
 
 #include "TankPlayerController.h"
 #include "TankAimingComponent.h"
-#include "Tank.h"
 
 //#include "Runtime/Core/Public/Misc/AssertionMacros.h."
 #include "Runtime/Engine/Classes/GameFramework/Actor.h"
@@ -12,7 +11,7 @@ void ATankPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	auto AimingComponent = GetControlledTank()->FindComponentByClass<UTankAimingComponent>();
+	auto AimingComponent = GetPawn()->FindComponentByClass<UTankAimingComponent>();
 	if (!ensureMsgf(AimingComponent, TEXT("Aiming component not set!"))) { return; }
 	FoundAimingComponent(AimingComponent);
 }
@@ -23,22 +22,16 @@ void ATankPlayerController::Tick( float DeltaTime )
 	AimTowardsCroshair();
 }
 
-ATank * ATankPlayerController::GetControlledTank() const
-{
-	return Cast<ATank>(GetPawn());
-}
-
 void ATankPlayerController::AimTowardsCroshair()
 {
-	auto ControlledTank = GetControlledTank();
-
-	if (!ensureMsgf(ControlledTank, TEXT("No controlled tank!"))) { return; }//TODO might be wrong
+	auto AimingComponent = GetPawn()->FindComponentByClass<UTankAimingComponent>();
+	if (!ensureMsgf(AimingComponent, TEXT("Aiming component not set!"))) { return; }
 	
 	FVector HitLocation; //Out Parameter
 	
 	if (GetSightRayHitLocation(HitLocation)) //Has "side effect", is going to line trace
 	{
-		ControlledTank->AimAt(HitLocation);
+		AimingComponent->AimAt(HitLocation);
 	}
 
 }
