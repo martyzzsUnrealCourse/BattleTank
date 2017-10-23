@@ -8,36 +8,39 @@
 
 class UTankAimingComponent;
 
+/**
+* Responsible for helping the player aim.
+*/
 UCLASS()
 class BATTLETANK_API ATankPlayerController : public APlayerController
 {
 	GENERATED_BODY()
-public:
-	virtual void BeginPlay() override;
 
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
 protected:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Setup")
-	void FoundAimingComponent(UTankAimingComponent* AimingCompRef);
+		void FoundAimingComponent(UTankAimingComponent* AimCompRef);
 
 private:
+	virtual void BeginPlay() override;
 
-	void AimTowardsCroshair();
+	virtual void Tick(float DeltaTime) override;
 
-	bool GetSightRayHitLocation(FVector & HitLocation) const;
+	// Start the tank moving the barrel so that a shot would hit where
+	// the crosshair intersects the world
+	void AimTowardsCrosshair();
 
-	bool GetLookDirection(FVector2D ScreenLocation, FVector & LookDirection) const;
-
-	bool GetLookVectorHitLocation(FVector LookDirrection, FVector & HitLocation) const;
-
-	UPROPERTY(EditDefaultsOnly)
-	float CroshairXLocation = 0.5;
-
-	UPROPERTY(EditDefaultsOnly)
-	float CroshairYLocation = 0.33333;
+	// Return an OUT parameter, true if hit landscape
+	bool GetSightRayHitLocation(FVector& HitLocation) const;
 
 	UPROPERTY(EditDefaultsOnly)
-	float LineTraceRange = 100000;
+		float CrosshairXLocation = 0.5;
 
+	UPROPERTY(EditDefaultsOnly)
+		float CrosshairYLocation = 0.3333;
+
+	UPROPERTY(EditDefaultsOnly)
+		float LineTraceRange = 1000000;
+
+	bool GetLookDirection(FVector2D ScreenLocation, FVector& LookDirection) const;
+	bool GetLookVectorHitLocation(FVector LookDirection, FVector& HitLocation) const;
 };

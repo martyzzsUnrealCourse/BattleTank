@@ -11,21 +11,25 @@ void ATankAIController::BeginPlay()
 	Super::BeginPlay();
 }
 
+// Called every frame
 void ATankAIController::Tick(float DeltaTime)
 {
-	Super::Tick( DeltaTime );
+	Super::Tick(DeltaTime);
 
 	auto PlayerTank = GetWorld()->GetFirstPlayerController()->GetPawn();
 	auto ControlledTank = GetPawn();
 
-	if (!ensureMsgf(PlayerTank && ControlledTank, TEXT("No player or controlled tank!"))) { return; }
+	if (!ensure(PlayerTank && ControlledTank)) { return; }
 
-	//Fire at player
+	// Move towards the player
+	MoveToActor(PlayerTank, AcceptanceRadius); // TODO check radius is in cm
+
+											   // Aim towards the player
 	auto AimingComponent = ControlledTank->FindComponentByClass<UTankAimingComponent>();
 	AimingComponent->AimAt(PlayerTank->GetActorLocation());
-	AimingComponent->Fire();
 
-	//Move towards player
-	MoveToActor(PlayerTank,AcceptenceRadius);
-	
+	if (AimingComponent->GetFiringState() == EFiringState::Locked)
+	{
+		AimingComponent->Fire(); // TODO limit firing rate
+	}
 }
